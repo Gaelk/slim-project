@@ -13,7 +13,7 @@ $app->get("/hello", function(Request $request, Response $reponse){
      */
     $param= $request->getParam("name")??"world";
     return $reponse->getBody()->write("<h1>hello $param</h1>");
-});
+})->add($dateMiddleWare);
 
 /**
  *route: /hello/{name} <= obligatoire
@@ -25,7 +25,8 @@ $app->get("/hello/{name}[/{age:\d{1,2}}]",function(Request $request, Response $r
         $html .="vous avez {$args["age"]} ans";
     }
     return $reponse->getBody()->write($html);
-})->setName("listHello");
+})->setName("listHello")->add($goodbyeMiddleWare);
+
 
 $app->get("/list", function(Request $request, Response $reponse){
     $url=$this->get("router")->pathFor("listHello",["name"=>"Alfred","age"=>58]);
@@ -41,14 +42,28 @@ $app->get("/api/user/list", function(Request $request, Response $reponse){
     return $reponse->withJson($users);
 });
 
-$app->get("/livres", function(Request $request, Response $reponse) {
-    $sql = "SELECT * FROM livres ";
 
-    /** @var \PDO */
-    $pdo = $this->get("pdo");
 
-    $data = $pdo->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+$app->group("/api", function()use($app){
 
-    return $reponse->withJson($data);
+    $app->get("/livre", function(Request $request, Reponse $reponse){
+        $sql = "SELECT * FROM livres";
+        /** @var \PDO */
+        $pdo=$this->get("pdo");
+        $data = $pdo->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        return $reponse->withJson($data);
 
-});
+    });
+
+
+    $app->get("/livres/{id:\d+}", function(Request $request, Response $reponse) {
+        $sql = "SELECT * FROM livres WHERE id=:id";
+
+        /** @var \PDO */
+        $pdo = $this->get("pdo");
+        $statement = $pdo->prepare($sql);
+        $data = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $reponse->withJson($data);
+    });
+})->add($apiProtection);
