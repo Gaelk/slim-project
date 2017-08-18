@@ -25,6 +25,12 @@ $app->get("/hello/{name}[/{age:\d{1,2}}]",function(Request $request, Response $r
         $html .="vous avez {$args["age"]} ans";
     }
     return $reponse->getBody()->write($html);
+})->setName("list_hello");
+
+$app->get("/list", function(Request $request, Response $reponse){
+    $url=$this->get("router")->pathFor("list_hello",["name"=>"Alfred","age"=>58]);
+    $link="<a href=$url>Lien vers Alfred</a>";
+    return $reponse->getBody()->write($link);
 });
 
 
