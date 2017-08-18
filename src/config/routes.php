@@ -71,5 +71,10 @@ $app->group("/api", function()use($app){
 
     $app->group("/auteur", function () use($app){
         $app->get("/", \app\Controller\AuthorController::class.":index"); //namespace : \app\Controller directement sur la linge parce que pas de Use
+        $app->get("/new", \app\Controller\AuthorController::class.":newAction");
+        $app->get("/delete/{id:\d+}", \app\Controller\AuthorController::class.":deleteAction");
     });
+
+
+
 })->add($apiProtection);
