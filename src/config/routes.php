@@ -46,17 +46,18 @@ $app->get("/api/user/list", function(Request $request, Response $reponse){
 
 $app->group("/api", function()use($app){
 
-    $app->get("/livre", function(Request $request, Reponse $reponse){
+    $app->get("/livre", function(Request $request, Response $response){
         $sql = "SELECT * FROM livres";
         /** @var \PDO */
         $pdo=$this->get("pdo");
         $data = $pdo->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
-        return $reponse->withJson($data);
+
+        return $response->withJson($data);
 
     });
 
 
-    $app->get("/livres/{id:\d+}", function(Request $request, Response $reponse) {
+    $app->get("/livre/{id:\d+}", function(Request $request, Response $response) {
         $sql = "SELECT * FROM livres WHERE id=:id";
 
         /** @var \PDO */
@@ -64,6 +65,11 @@ $app->group("/api", function()use($app){
         $statement = $pdo->prepare($sql);
         $data = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $reponse->withJson($data);
+        return $response->withJson($data);
+
+    });
+
+    $app->group("/auteur", function () use($app){
+        $app->get("/", \app\Controller\AuthorController::class.":index"); //namespace : \app\Controller directement sur la linge parce que pas de Use
     });
 })->add($apiProtection);
